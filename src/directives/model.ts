@@ -5,12 +5,18 @@ import { listen } from '../utils'
 export const model: Directive<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 > = ({ el, exp, get, effect, modifiers }) => {
+  const escapeBackslashRegex = /\\/g;
+  const escapeQuoteRegex = /"/g;
   const type = el.type
-  
+
   const assign = (val: any) => {
-    get(`${exp} = '${val}'`)
+    let _safeVal  = val.replace(escapeBackslashRegex, "\\\\");
+
+    _safeVal = _safeVal.replace(escapeQuoteRegex, "\\\"");
+
+    get(`${exp} = "${_safeVal}"`)
   }
-  
+
   const { trim, number = type === 'number' } = modifiers || {}
 
   if (el.tagName === 'SELECT') {
